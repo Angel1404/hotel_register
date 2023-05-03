@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../theme/theme.dart';
@@ -21,6 +22,7 @@ class InputGenery extends StatefulWidget {
     this.initValue,
     this.enable,
     this.padding,
+    this.inputFormatters,
   });
 
   final bool? obscureText;
@@ -38,6 +40,7 @@ class InputGenery extends StatefulWidget {
   final String? initValue;
   final bool? enable;
   final EdgeInsetsGeometry? padding;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   State<InputGenery> createState() => _InputGeneryState();
@@ -77,6 +80,7 @@ class _InputGeneryState extends State<InputGenery> {
           cursorColor: Colors.blueAccent[700],
           obscuringCharacter: '-',
           enableIMEPersonalizedLearning: true,
+          inputFormatters: widget.inputFormatters,
           decoration: InputDecoration(
             hintText: widget.hintText ?? 'Correo',
             hintStyle: ThemeInfo.styleInputsHintText,

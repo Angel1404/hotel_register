@@ -3,6 +3,8 @@ import 'dart:ui' as ui;
 import 'package:android_path_provider/android_path_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:hotel_r/ui/utils/share.dart';
+import 'package:hotel_r/ui/utils/texts_app.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -11,6 +13,8 @@ import '../../data/models/clientes_model.dart';
 import '../../translation/app_text_translation.dart';
 
 Future<File> generatePdf({required ui.Image image, required ClienteModels client}) async {
+  await permissionExternalStorager();
+
   final pdf = pw.Document();
   final date = DateTime.now().toUtc().second.toString();
   final imagenFm =
@@ -18,9 +22,13 @@ Future<File> generatePdf({required ui.Image image, required ClienteModels client
 
   final bytes = (await rootBundle.load('assets/logo.jpeg')).buffer.asUint8List();
   final logoImage = pw.MemoryImage(bytes);
+  const pageTheme = pw.PageTheme(
+    margin: pw.EdgeInsets.all(5.0 * PdfPageFormat.mm),
+  );
 
   pdf.addPage(
     pw.Page(
+      pageTheme: pageTheme,
       build: (pw.Context context) => pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
@@ -30,35 +38,85 @@ Future<File> generatePdf({required ui.Image image, required ClienteModels client
             alignment: pw.Alignment.centerLeft,
             child: pw.Image(logoImage),
           ),
-          pw.SizedBox(
+          pw.Container(
+            alignment: pw.Alignment.centerLeft,
             width: double.maxFinite,
-            child: pw.Wrap(
-              runSpacing: 5,
-              spacing: 10,
-              children: [
-                pwContainer(title: AppTextTranslation.nameFieldText.tr, value: client.name),
-                pwContainer(title: AppTextTranslation.direccionFieldText.tr, value: client.adress),
-                pwContainer(title: AppTextTranslation.cityFieldText.tr, value: client.city),
-                pwContainer(title: AppTextTranslation.countryFieldText.tr, value: client.country),
-                pwContainer(title: AppTextTranslation.phoneFieldText.tr, value: client.phone),
-                pwContainer(title: AppTextTranslation.emailLoginText.tr, value: client.email),
-              ],
+            child: pw.Text(
+              tarjetaDeRegistroHotelero,
+              textAlign: pw.TextAlign.center,
+              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+            ),
+          ),
+          pw.Container(height: 10),
+          pw.Table(
+            border: pw.TableBorder.all(width: 1, color: PdfColors.black),
+            children: [
+              tablwContent(titles: [
+                AppTextTranslation.nameFieldText.tr,
+                AppTextTranslation.direccionFieldText.tr,
+              ], values: [
+                client.name,
+                client.adress,
+              ]),
+              tablwContent(titles: [
+                AppTextTranslation.cityFieldText.tr,
+                AppTextTranslation.countryFieldText.tr,
+              ], values: [
+                client.city,
+                client.country,
+              ]),
+              tablwContent(titles: [
+                AppTextTranslation.phoneFieldText.tr,
+                AppTextTranslation.emailLoginText.tr,
+              ], values: [
+                client.phone,
+                client.email,
+              ]),
+            ],
+          ),
+          pw.Container(height: 10),
+          pw.Container(
+            width: double.maxFinite,
+            child: pw.Text(
+              textServiceClient,
+              textAlign: pw.TextAlign.center,
+              style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
+            ),
+          ),
+          pw.Container(height: 20),
+          pw.Container(
+            width: double.maxFinite,
+            child: pw.Text(
+              derechosHotelPDF,
+              style: const pw.TextStyle(fontSize: 10),
             ),
           ),
           pw.Container(
-            height: 210,
-            width: double.maxFinite,
+            width: 200,
             alignment: pw.Alignment.center,
             padding: const pw.EdgeInsets.all(15),
             margin: const pw.EdgeInsets.all(15),
-            decoration: pw.BoxDecoration(
-              border: pw.Border.all(width: 1.5),
-              borderRadius: pw.BorderRadius.circular(20),
-            ),
-            child: pw.Image(
-              imagenFm,
-              height: 200,
-              width: 350,
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                pw.Image(
+                  imagenFm,
+                  height: 150,
+                  width: 100,
+                ),
+                pw.Divider(thickness: 2),
+                pw.SizedBox(
+                  child: pw.Text(
+                    'Firma - Signature\nHotel',
+                    textAlign: pw.TextAlign.center,
+                    style: pw.TextStyle(
+                      color: PdfColors.black,
+                      fontSize: 10,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -73,60 +131,56 @@ Future<File> generatePdf({required ui.Image image, required ClienteModels client
 
 //Componer una especie de tablas para acomodar el formulario
 pwContainer({required String title, required String value}) {
-  return pw.Container(
-    width: 150,
-    color: PdfColors.red,
-    child: pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Container(
-          width: double.maxFinite,
-          padding: const pw.EdgeInsets.all(10),
-          decoration: pw.BoxDecoration(
-            color: PdfColors.grey,
-            border: pw.Border.all(width: 1.5),
-          ),
-          child: pw.Text(
-            title,
-            style: pw.TextStyle(
-              color: PdfColors.black,
-              fontSize: 18,
-              fontWeight: pw.FontWeight.bold,
-            ),
+  return pw.Row(
+    crossAxisAlignment: pw.CrossAxisAlignment.start,
+    children: [
+      pw.Container(
+        padding: const pw.EdgeInsets.all(5),
+        decoration: const pw.BoxDecoration(
+          color: PdfColors.grey,
+          // border: pw.Border.all(width: 1.5),
+        ),
+        child: pw.Text(
+          title,
+          style: pw.TextStyle(
+            color: PdfColors.black,
+            fontSize: 10,
+            fontWeight: pw.FontWeight.bold,
           ),
         ),
-        pw.Container(
-          width: double.maxFinite,
-          padding: const pw.EdgeInsets.all(10),
-          decoration: pw.BoxDecoration(
-            color: PdfColors.white,
-            border: pw.Border.all(width: 1.5),
-          ),
-          child: pw.Text(
-            value,
-            style: const pw.TextStyle(
-              color: PdfColors.black,
-              fontSize: 20,
-            ),
+      ),
+      pw.Container(
+        padding: const pw.EdgeInsets.all(5),
+        decoration: const pw.BoxDecoration(
+          color: PdfColors.white,
+          // border: pw.Border.all(width: 1.5),
+        ),
+        child: pw.Text(
+          value,
+          style: const pw.TextStyle(
+            color: PdfColors.black,
+            fontSize: 12,
           ),
         ),
-      ],
+      ),
+    ],
+  );
+}
+
+tablwContent({required List<String> titles, required List<String> values}) {
+  return pw.TableRow(
+    decoration: pw.BoxDecoration(
+      color: PdfColors.white,
+      border: pw.Border.all(),
+    ),
+    children: List.generate(
+      titles.length,
+      (index) => pwContainer(
+        title: titles[index],
+        value: values[index],
+      ),
     ),
   );
-
-  // pw.Container(
-  //   padding: const pw.EdgeInsets.all(10),
-  //   decoration: pw.BoxDecoration(
-  //     border: pw.Border.all(),
-  //   ),
-  //   child: pw.Text(
-  //     value,
-  //     style: const pw.TextStyle(
-  //       color: PdfColors.black,
-  //       fontSize: 20,
-  //     ),
-  //   ),
-  // ),
 }
 
 Future<File> convertBytesToFile({required ui.Image image, String? nameImage}) async {

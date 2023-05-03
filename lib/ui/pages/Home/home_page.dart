@@ -1,7 +1,8 @@
-import 'package:country_state_city_pro/country_state_city_pro.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:country_state_city_pro/country_state_city_pro.dart';
 import 'package:hotel_r/ui/global_widgets/buttons.dart';
 import 'package:hotel_r/ui/global_widgets/dialogs.dart';
 import 'package:hotel_r/ui/global_widgets/inputs.dart';
@@ -33,13 +34,14 @@ class _HomePageState extends State<HomePage> {
     cityController = TextEditingController();
     addressController = TextEditingController();
     stateController = TextEditingController();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   }
 
   final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
   final controller = HomeController.to;
 
   saveDate() async {
-    final image = await _signaturePadKey.currentState?.toImage();
+    final image = await _signaturePadKey.currentState?.toImage(pixelRatio: 0.5);
 
     if (nController!.text.isEmpty ||
         phoneController!.text.isEmpty ||
@@ -108,9 +110,11 @@ class _HomePageState extends State<HomePage> {
                 InputGenery(controller: nController, textInputType: TextInputType.name, hintText: '${AppTextTranslation.nameFieldText.tr}*'),
                 SizedBox(height: Get.height * .03),
                 InputGenery(
-                    controller: addressController,
-                    hintText: '${AppTextTranslation.direccionFieldText.tr}*',
-                    textInputType: TextInputType.streetAddress),
+                  controller: addressController,
+                  hintText: '${AppTextTranslation.direccionFieldText.tr}*',
+                  textInputType: TextInputType.streetAddress,
+                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9\s]+$'))],
+                ),
                 SizedBox(height: Get.height * .03),
                 _SelectCountryAndCity(countryController: countryController, stateController: stateController, cityController: cityController),
                 SizedBox(height: Get.height * .03),

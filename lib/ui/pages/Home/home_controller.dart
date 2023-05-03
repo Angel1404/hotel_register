@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 import 'package:get/get.dart';
 import 'package:hotel_r/data/models/clientes_model.dart';
+import 'package:hotel_r/ui/global_widgets/dialogs.dart';
 
 import '../../../data/provider/db.dart';
 import '../../utils/pdf_generate.dart';
@@ -30,6 +31,8 @@ class HomeController extends GetxController {
       DBClientes.db.nuevoRegistro(clienteModelnew);
     } catch (e) {
       print('ERR $e');
+      doneDialodOk(message: e.toString());
+      return;
     }
   }
 }
