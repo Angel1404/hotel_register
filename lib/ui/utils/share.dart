@@ -25,8 +25,12 @@ String selectType({required String type}) {
 
 Future permissionExternalStorager() async {
   final isEnable = await ph.Permission.manageExternalStorage.isGranted;
+  final isEnableStorage = await ph.Permission.storage.isGranted;
   if (!isEnable) {
     await ph.Permission.manageExternalStorage.request();
+  }
+  if (!isEnableStorage) {
+    await ph.Permission.storage.request();
   }
 }
 
