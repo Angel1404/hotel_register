@@ -11,17 +11,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DBClientes.db.initDB();
 
-  runApp(GetMaterialApp(
-    debugShowCheckedModeBanner: false,
-    title: Config.data['title'].toString(),
-    theme: ThemeInfo.getTheme(),
-    defaultTransition: Transition.fade,
-    translations: AppTranslations(),
-    locale: Get.deviceLocale,
-
-    // initialBinding: SplashBinding(),
-    getPages: AppPages.pages,
-    initialRoute: Routes.WELCOMEPAGE,
-    // home: SplashPage(),
-  ));
+  runApp(
+    GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: Config.data['title'].toString(),
+      theme: ThemeInfo.getTheme(),
+      defaultTransition: Transition.fade,
+      translations: AppTranslations(),
+      locale: Get.deviceLocale,
+      getPages: AppPages.pages,
+      initialRoute: Routes.WELCOMEPAGE,
+    ),
+  );
 }

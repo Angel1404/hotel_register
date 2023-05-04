@@ -43,16 +43,16 @@ class _HomePageState extends State<HomePage> {
   saveDate() async {
     final image = await _signaturePadKey.currentState?.toImage(pixelRatio: 0.5);
 
-    if (nController!.text.isEmpty ||
-        phoneController!.text.isEmpty ||
-        countryController!.text.isEmpty ||
-        cityController!.text.isEmpty ||
-        addressController!.text.isEmpty) {
+    if (nController!.text.trim().isEmpty ||
+        phoneController!.text.trim().isEmpty ||
+        countryController!.text.trim().isEmpty ||
+        cityController!.text.trim().isEmpty ||
+        addressController!.text.trim().isEmpty) {
       doneDialodOk(message: AppTextTranslation.errFieldText.tr);
       return;
     }
 
-    if (!emialController!.text.isEmail || emialController!.text.isEmpty) {
+    if (!emialController!.text.trim().isEmail || emialController!.text.trim().isEmpty) {
       doneDialodOk(message: AppTextTranslation.emailErrorText.tr);
       return;
     }
@@ -60,12 +60,12 @@ class _HomePageState extends State<HomePage> {
       doneDialodOk(message: AppTextTranslation.errReadRightsAndObligationsText.tr);
       return;
     }
-    if (image == null) {
+    if (!controller.writeSignature.value) {
       doneDialodOk(message: AppTextTranslation.errImageFirmaText.tr);
       return;
     }
     await controller.saveData(
-      image: image,
+      image: image!,
       adress: addressController!.text,
       city: cityController!.text,
       country: countryController!.text,
@@ -74,8 +74,8 @@ class _HomePageState extends State<HomePage> {
       phone: phoneController!.text,
     );
 
-    clearData();
     snackBarInfo(messageTitle: nController!.text, bodyMessage: AppTextTranslation.succefullText.tr);
+    clearData();
   }
 
   clearData() {
@@ -87,10 +87,9 @@ class _HomePageState extends State<HomePage> {
     phoneController!.clear();
     controller.readRightsHotel.value = false;
     _signaturePadKey.currentState!.clear();
+    controller.writeSignature.value = false;
   }
 
-  String selectedCountry = "";
-  String selectedState = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +101,6 @@ class _HomePageState extends State<HomePage> {
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.only(bottom: 30),
             child: Column(
-              // mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: Get.height * .05),
                 AutoSizeTextApp(title: '${AppTextTranslation.titleFormularioText.tr}*', textStyle: ThemeInfo.styleTitleApp, maxLines: 1),
@@ -168,6 +166,7 @@ class _SelectCountryAndCity extends StatelessWidget {
       controller: countryController,
       hintText: countryController!.text.isEmpty ? '${AppTextTranslation.countryFieldText.tr}*' : countryController!.text,
       onTap: () {
+        FocusScope.of(context).unfocus();
         Get.dialog(
           SimpleDialog(
             children: [
@@ -185,7 +184,8 @@ class _SelectCountryAndCity extends StatelessWidget {
                     ButtonGenery(
                       titleBtn: AppTextTranslation.saveCountryCityText.tr,
                       onPressed: () {
-                        // setState(() {});
+                        FocusScope.of(context).nextFocus();
+
                         Get.back();
                       },
                     )
@@ -224,7 +224,7 @@ class _RightsAndOligationsHotel extends StatelessWidget {
               child: const Scrollbar(
                 child: SingleChildScrollView(
                   physics: BouncingScrollPhysics(),
-                  child: Text(derechosHotel, textAlign: TextAlign.justify),
+                  child: Text(derechosHotelPDF, textAlign: TextAlign.justify),
                 ),
               ),
             ),
@@ -283,6 +283,10 @@ class _FirmaCard extends StatelessWidget {
             maximumStrokeWidth: 3,
             strokeColor: Colors.black,
             backgroundColor: Colors.white,
+            onDrawStart: () {
+              HomeController.to.writeSignature.value = true;
+              return false;
+            },
           ),
           Align(
             alignment: Alignment.topRight,
@@ -291,8 +295,9 @@ class _FirmaCard extends StatelessWidget {
               child: TextButton(
                 child: const Text('Limpiar'),
                 onPressed: () {
+                  HomeController.to.writeSignature.value = false;
+
                   signaturePadKey.currentState?.clear();
-                  signaturePadKey.currentState?.toImage();
                 },
               ),
             ),

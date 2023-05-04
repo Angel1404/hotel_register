@@ -44,16 +44,6 @@ class DBClientes {
   }
 
   Future nuevoRegistro(ClienteModels result) async {
-    final id = result.id;
-    // final createdAt = DateTime.parse(result.createdAt).toLocal();
-    final name = result.name;
-    final adress = result.adress;
-    final city = result.city;
-    final country = result.country;
-    final phone = result.phone;
-    final email = result.email;
-    final filePdf = result.filePdf;
-    //Verificar la Bd
     final db = await database;
 
     await db?.insert('Clientes', result.toMapInsert(), conflictAlgorithm: ConflictAlgorithm.replace);

@@ -21,11 +21,9 @@ class WelcomePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Text('Bienvenido(a)/Welcome - ${Config.data['title']}', textAlign: TextAlign.center, style: ThemeInfo.styleTitleApp),
                 SizedBox(height: Get.height * .3),
                 const Text('Seleccina el idioma/Select your language', textAlign: TextAlign.center, style: ThemeInfo.styleTitleApp),
                 SizedBox(height: Get.height * .02),
-
                 ButtonGenery(
                   titleBtn: 'Español',
                   onPressed: () async {

@@ -1,18 +1,23 @@
 import 'dart:io';
 
-import 'package:share_plus/share_plus.dart';
+// import 'package:share_plus/share_plus.dart';
+import 'package:hotel_r/ui/global_widgets/dialogs.dart';
 import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart' as ph;
 
-Future<ShareResultStatus> sharedPhoto(String filePath, {String? message}) async {
-  final res = await Share.shareXFiles([XFile(filePath)], text: message ?? 'Great picture');
-  return res.status;
-}
+// Future<ShareResultStatus> sharedPhoto(String filePath, {String? message}) async {
+//   final res = await Share.shareXFiles([XFile(filePath)], text: message ?? 'Great picture');
+//   return res.status;
+// }
 
 openFileLocal({required String file}) async {
   await permissionExternalStorager();
-  final r = await OpenFile.open(file, type: selectType(type: '.${file.split('.').last}'));
-  print(r);
+  try {
+    await OpenFile.open(file, type: selectType(type: '.${file.split('.').last}'));
+  } catch (e) {
+    doneDialodOk(message: e.toString());
+    return;
+  }
 }
 
 String selectType({required String type}) {

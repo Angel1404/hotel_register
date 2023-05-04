@@ -10,6 +10,7 @@ class HomeController extends GetxController {
   static HomeController get to => Get.find<HomeController>();
 
   final readRightsHotel = false.obs;
+  final writeSignature = false.obs;
 
   Future saveData({
     required ui.Image image,
@@ -30,7 +31,6 @@ class HomeController extends GetxController {
       // openFileLocal(file: pdfsave.path);
       DBClientes.db.nuevoRegistro(clienteModelnew);
     } catch (e) {
-      print('ERR $e');
       doneDialodOk(message: e.toString());
       return;
     }

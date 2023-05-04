@@ -184,7 +184,7 @@ tablwContent({required List<String> titles, required List<String> values}) {
 }
 
 Future<File> convertBytesToFile({required ui.Image image, String? nameImage}) async {
-  final output = await _getSavedDir();
+  final output = (await getTemporaryDirectory()).path;
   final bytes = (await image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asInt8List();
   final filepath = nameImage ?? DateTime.now().toUtc().toString();
   File imgFile = File("$output/$filepath.png");
